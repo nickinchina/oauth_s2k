@@ -19,7 +19,7 @@ var mssql = require('mssql');
 var q = require('q');
 
 module.exports = {
-    query: function(statement){
+    query_simple: function(statement){
         var deferred = q.defer();
         var conn = new mssql.Connection(config);
         conn.connect(function __QUERY__(err) {
@@ -31,5 +31,28 @@ module.exports = {
             });
         });
         return deferred.promise;
-    }
+    },
+    // var setParams = function(request, mssql) {
+    //     params.forEach(function(i){
+    //         if (i.length)
+    //             request.input(i.name, mssql['NVarChar'](4001), i.value);
+    //         else
+    //             request.input(i.name, mssql[i.type], i.value);
+    //     })
+    // };
+    query: function(statement, cbSetParams) {
+        var deferred = q.defer();
+        var connection = new mssql.Connection(config, function(err) {
+            if (err) return deferred.reject(err);
+            var request = new mssql.Request(connection);
+            if (cbSetParams) {
+                cbSetParams(request, mssql);
+            }
+            request.execute(statement, function(err, recordset) {
+                if (err) return deferred.reject(err);
+                deferred.resolve(recordset);
+            });
+        });
+        return deferred.promise;
+    },
 }
