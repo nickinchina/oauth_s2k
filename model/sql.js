@@ -40,14 +40,19 @@ module.exports = {
     //             request.input(i.name, mssql[i.type], i.value);
     //     })
     // };
-    query: function(statement, cbSetParams) {
+    query: function(statement, params) {
         var deferred = q.defer();
         var connection = new mssql.Connection(config, function(err) {
             if (err) return deferred.reject(err);
             var request = new mssql.Request(connection);
-            if (cbSetParams) {
-                cbSetParams(request, mssql);
-            }
+            
+            params = params||[];
+            params.forEach(params, function(i){
+                if (i.length)
+                    request.input(i.name, mssql[i.type](4001), i.value);
+                else
+                    request.input(i.name, mssql[i.type], i.value);
+            })
             request.execute(statement, function(err, recordset) {
                 if (err) return deferred.reject(err);
                 deferred.resolve(recordset);
