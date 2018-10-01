@@ -17,7 +17,7 @@ module.exports.getAccessToken = function(bearerToken) {
 	];
 	sql.query('hq.sp_oauth_get_token',params)
 	.then(function(result) {
-	 	var token = result.rows[0];
+	 	var token = result[0];
 	  	return {
 			accessToken: token.access_token,
 			client: {id: token.client_id},
@@ -39,7 +39,7 @@ module.exports.getRefreshToken = function(bearerToken) {
 	];
 	sql.query('hq.sp_oauth_get_token',params)
 	.then(function(result) {
-	 	var token = result.rows[0];
+	 	var token = result[0];
 	 	//return result.rowCount ? result.rows[0] : false;
 	  	return token;
 	});
@@ -57,7 +57,7 @@ module.exports.getClient = function(clientId, clientSecret) {
 	];
 	sql.query('hq.sp_oauth_get_client',params)
 	.then(function(result) {
-		var oAuthClient = result.rows[0];
+		var oAuthClient = result[0];
 		if (!oAuthClient) {
 			return;
 	 	}
@@ -82,7 +82,7 @@ module.exports.getUser = function(username, password) {
 	];
 	sql.query('hq.sp_oauth_get_user', params)
 	.then(function(result) {
-		var user = result.rows[0];
+		var user = result[0];
 	 	//return result.rowCount ? result.rows[0] : false;
 	  	return user;
 	});
@@ -104,7 +104,7 @@ module.exports.saveAccessToken = function(token, client, user) {
 	];
 	sql.query('hq.sp_oauth_save_token', params)
 	.then(function(result) {
-		var token = result.rows[0];
+		var token = result[0];
 		//return result.rowCount ? result.rows[0] : false;
 		return token;
 	});

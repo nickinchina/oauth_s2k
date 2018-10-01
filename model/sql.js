@@ -49,7 +49,7 @@ module.exports = {
             params = params||[];
             params.forEach(params, function(i){
                 if (i.length)
-                    request.input(i.name, mssql[i.type](4001), i.value);
+                    request.input(i.name, mssql[i.type](i.length), i.value);
                 else
                     request.input(i.name, mssql[i.type], i.value);
             })
