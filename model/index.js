@@ -9,9 +9,15 @@ var sql = require('./sql.js');
  * Get access token.
  */
 
+//Modified by Lucky, on Oct.1,2018
 module.exports.getAccessToken = function(bearerToken) {
-  return sql.query('SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE access_token = $1', 
-    [bearerToken])
+  //return sql.query('SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE access_token = $1', 
+  //  [bearerToken])
+  var params = [
+	{name:'token',type:'NVarChar',length:500,value:bearerToken},
+	{name:'type',type:'TinyInt',value:0}
+  ];
+  sql.query('EXEC hq.sp_oauth_get_token',setParams) //??? how to write setParams ???
     .then(function(result) {
       var token = result.rows[0];
 
