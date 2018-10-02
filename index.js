@@ -10,7 +10,7 @@ var model = require('./model');
 
 module.exports = function(app, passport){
   // Add OAuth server.
-  app.oauth = oauthServer({model: model});
+  app.oauth = new oauthServer({model: model});
   
   // Post token.
   app.post('/oauth/token', app.oauth.token());
