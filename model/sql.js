@@ -1,6 +1,6 @@
 var config = {
     user: 'sa',
-    password: '2447532',
+    password: 'Ogram@9808',
     server:  process.env.DB_SERVER||'10.0.0.99',
     port: process.env.DB_PORT||31433,
     database:process.env.DB_NAME||'s2k',
@@ -47,7 +47,7 @@ module.exports = {
             var request = new mssql.Request(connection);
             
             params = params||[];
-            params.forEach(params, function(i){
+            params.forEach(function(i){
                 if (i.length)
                     request.input(i.name, mssql[i.type](i.length), i.value);
                 else
@@ -55,7 +55,7 @@ module.exports = {
             })
             request.execute(statement, function(err, recordset) {
                 if (err) return deferred.reject(err);
-                deferred.resolve(recordset);
+                deferred.resolve(recordset[0]);
             });
         });
         return deferred.promise;

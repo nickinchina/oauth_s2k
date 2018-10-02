@@ -16,13 +16,15 @@ module.exports = function(app, passport){
   app.post('/oauth/token', app.oauth.token());
   
   var login_redirect = function(req){
-    return util.format('/oauth/login?redirect=%s&client_id=%s&redirect_uri=%s', req.path, req.query.client_id, req.query.redirect_uri);
+    return util.format('/oauth/login?redirect=%s&client_id=%s&redirect_uri=%s&client_secret=%s', 
+      req.path, req.query.client_id, req.query.redirect_uri,req.query.client_secret);
   }
   var render_page = function(req, res, next, page){
     sails._mixinResView(req,res,next);
     return res.view(page+'/index.ejs', {
       redirect: req.query.redirect,
       client_id: req.query.client_id,
+      client_secret: req.query.client_secret,
       redirect_uri: req.query.redirect_uri
     });
   }
@@ -60,7 +62,8 @@ module.exports = function(app, passport){
         }
         req.logIn(user, function(err) {
             if (err) { return res.send(err); }
-            return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s', req.body.redirect, req.body.client_id, req.body.redirect_uri));
+            return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&client_secret=%s', 
+              req.body.redirect, req.body.client_id, req.body.redirect_uri, req.body.client_secret));
         });
     })(req, res);
     

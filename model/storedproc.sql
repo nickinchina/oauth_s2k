@@ -18,7 +18,7 @@ AS
 BEGIN
 	SELECT client_id, client_secret, redirect_uri
 	  FROM hq.oauth_clients 
-	 WHERE client_id=@client_id AND client_secret=@client_secret;
+	 WHERE client_id=@client_id AND (@client_secret is null or client_secret=@client_secret);
 END
 GO
 --DROP PROCEDURE [hq].[sp_oauth_get_user]
@@ -27,7 +27,7 @@ CREATE OR ALTER PROCEDURE [hq].[sp_oauth_get_user]
 	@password nvarchar(100)
 AS
 BEGIN
-	SELECT id FROM hq.pz_user WHERE name=@username AND password=@password;
+	SELECT * FROM hq.pz_user WHERE email=@username AND password=@password;
 END
 GO
 --DROP PROCEDURE [hq].[sp_oauth_save_token]
