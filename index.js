@@ -8,7 +8,7 @@ var model = require('./model');
 
 // Create an Express application.
 
-module.exports = function(app, render, passport){
+module.exports = function(app, passport){
   // Add OAuth server.
   app.oauth = oauthServer({model: model});
   
@@ -18,8 +18,8 @@ module.exports = function(app, render, passport){
   var login_redirect = function(req){
     return util.format('/oauth/login?redirect=%s&client_id=%s&redirect_uri=%s', req.path, req.query.client_id, req.query.redirect_uri);
   }
-  var render_page = function(req, page){
-    return render(page, {
+  var render_page = function(req, res, page){
+    return res.view(page, {
       redirect: req.query.redirect,
       client_id: req.query.client_id,
       redirect_uri: req.query.redirect_uri
@@ -31,7 +31,7 @@ module.exports = function(app, render, passport){
     if (!req.app.locals.user) {
       return res.redirect(login_redirect(req));
     }
-    return render_page(req,'authorize');
+    return render_page(req, res, 'authorize');
   });
   
   // Post authorization.
@@ -44,8 +44,8 @@ module.exports = function(app, render, passport){
   });
   
   // Get login.
-  app.get('/oauth/login', function(req) {
-    return render_page(req,'login');
+  app.get('/oauth/login', function(req, res) {
+    return render_page(req, res, 'login');
   });
   
   // Post login.
