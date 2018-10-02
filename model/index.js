@@ -68,7 +68,8 @@ module.exports.getClient = function(clientId, clientSecret) {
 		 	return {
 		 		clientId: oAuthClient.client_id,
 		 		clientSecret: oAuthClient.client_secret,
-		 		grants: ['password']
+		 		redirectUris: [oAuthClient.redirect_uri],
+		 		grants: ['password','authorization_code','refresh-token']
 		 	};
 		})
 		.catch(function (err) {
@@ -101,7 +102,7 @@ module.exports.getUser = function(username, password) {
  */
 
 //Modified by Lucky, on Oct.1,2018
-module.exports.saveAccessToken = function(token, client, user) {
+module.exports.saveToken = module.exports.saveAccessToken = function(token, client, user) {
 	var params = [
 		{name:'access_token',type:'NVarChar',length:500,value:token.access_token},
 		{name:'access_token_expires_on',type:'DateTime',value:token.access_token_expires_on},
@@ -146,17 +147,17 @@ module.exports.getAuthorizationCode = function(code) {
 }
 
 module.exports.saveAuthorizationCode = function(code, client, user) {
+	
 	var params = [
-	    {name:'client_id',type:'NVarChar',length:80,value:client.id},
+	    {name:'client_id',type:'NVarChar',length:80,value:client.clientId},
 	    {name:'authorization_code',type:'NVarChar',length:256,value:code.authorizationCode},
-	    {name:'user_id',type:'Int',value:code.user_id},
+	    {name:'user_id',type:'Int',value:user.id},
 	    {name:'expires',type:'DateTime',value:code.expiresAt},
 	    {name:'scope',type:'NVarChar',length:100,value:code.scope}
 	];
   return sql
     .query("hq.sp_set_oauth_authorization_code", params)
     .then(function () {
-		console.log('saveAuthorizationCode')
       code.code = code.authorizationCode
       return code;
     }).catch(function (err) {

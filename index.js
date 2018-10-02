@@ -3,6 +3,7 @@
  */
 
 var oauthServer = require('./lib');
+var Response = oauthServer.Response;
 var util = require('util');
 var model = require('./model');
 
@@ -28,24 +29,23 @@ module.exports = function(app, passport){
       redirect_uri: req.query.redirect_uri
     });
   }
-  // Get authorization.
-  app.get('/oauth/authorize', function(req, res, next) {
-    // Redirect anonymous users to login page.
-    var user = req.user;
-    if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
-    if (!user) return res.redirect(login_redirect(req));
-    return app.oauth.authorize()(req, res, next);
-    //return res.json('{}')
-    //return render_page(req, res, next, 'authorize');
-  });
+  
   
   // Post authorization.
-  app.post('/oauth/authorize', function(req, res, next) {
+  app.all('/oauth/authorize', function(req, res, next) {
     // Redirect anonymous users to login page.
     var user = req.user;
     if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
     if (!user) return res.redirect(login_redirect(req));
-    return app.oauth.authorize()(req, res, next);
+    console.log('req.headers.authorization',req.headers.authorization)
+    var authenticateHandler = {
+      handle: function(request, response) {
+        return user;
+      }
+    }
+    return app.oauth.authorize({
+      authenticateHandler:authenticateHandler,allowEmptyState:true
+    })(req, res, next);
   });
   
   // Get login.
@@ -62,6 +62,7 @@ module.exports = function(app, passport){
         }
         req.logIn(user, function(err) {
             if (err) { return res.send(err); }
+            
             return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&client_secret=%s', 
               req.body.redirect, req.body.client_id, req.body.redirect_uri, req.body.client_secret));
         });

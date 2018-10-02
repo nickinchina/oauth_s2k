@@ -59,3 +59,24 @@ BEGIN
 		@user_id);
 END
 GO
+create or alter proc hq.sp_get_oauth_authorization_code
+	@code nvarchar(256)
+as
+	select client_id,expires,user_id,scope,
+		(SELECT *
+		FROM hq.oauth_clients  WHERE client_id=a.client_id for json path, without_array_wrapper) as OAuthClient,
+		(SELECT *
+		FROM hq.pz_user  WHERE id=a.user_id for json path, without_array_wrapper) as [User]
+	from hq.oauth_authorization_codes a
+	where authorization_code=@code;
+	
+GO 
+create or alter proc hq.sp_set_oauth_authorization_code
+	@client_id nvarchar(80),
+    @authorization_code nvarchar(256),
+	@user_id int,
+    @expires datetime,
+    @scope nvarchar(100)
+ as 
+	insert into hq.oauth_authorization_codes (id,client_id,authorization_code,user_id,expires,scope)
+	values (NEWID(),@client_id,@authorization_code,@user_id,@expires,@scope)
