@@ -18,34 +18,37 @@ module.exports = function(app, passport){
   var login_redirect = function(req){
     return util.format('/oauth/login?redirect=%s&client_id=%s&redirect_uri=%s', req.path, req.query.client_id, req.query.redirect_uri);
   }
-  var render_page = function(req, res, page){
-    return res.view(page, {
+  var render_page = function(req, res, next, page){
+    sails._mixinResView(req,res,next);
+    return res.view(page+'/index.ejs', {
       redirect: req.query.redirect,
       client_id: req.query.client_id,
       redirect_uri: req.query.redirect_uri
     });
   }
   // Get authorization.
-  app.get('/oauth/authorize', function(req, res) {
+  app.get('/oauth/authorize', function(req, res, next) {
     // Redirect anonymous users to login page.
-    if (!req.app.locals.user) {
-      return res.redirect(login_redirect(req));
-    }
-    return render_page(req, res, 'authorize');
+    var user = req.user;
+    if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
+    if (!user) return res.redirect(login_redirect(req));
+    return app.oauth.authorize()(req, res, next);
+    //return res.json('{}')
+    //return render_page(req, res, next, 'authorize');
   });
   
   // Post authorization.
-  app.post('/oauth/authorize', function(req, res) {
+  app.post('/oauth/authorize', function(req, res, next) {
     // Redirect anonymous users to login page.
-    if (!req.app.locals.user) {
-      return res.redirect(login_redirect);
-    }
-    return app.oauth.authorize();
+    var user = req.user;
+    if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
+    if (!user) return res.redirect(login_redirect(req));
+    return app.oauth.authorize()(req, res, next);
   });
   
   // Get login.
-  app.get('/oauth/login', function(req, res) {
-    return render_page(req, res, 'login');
+  app.get('/oauth/login', function(req, res, next) {
+    return render_page(req, res, next, 'login');
   });
   
   // Post login.
@@ -57,7 +60,7 @@ module.exports = function(app, passport){
         }
         req.logIn(user, function(err) {
             if (err) { return res.send(err); }
-            return res.redirect(util.format('/%s?client_id=%s&redirect_uri=%s', req.body.redirect, req.query.client_id, req.query.redirect_uri));
+            return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s', req.body.redirect, req.body.client_id, req.body.redirect_uri));
         });
     })(req, res);
     
