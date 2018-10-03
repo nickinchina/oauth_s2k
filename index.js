@@ -78,6 +78,21 @@ module.exports = function(app, passport){
     
   });
   
+  app.get('/oauth/user', app.oauth.authenticate(), function(req, res) {
+    // Will require a valid access_token.
+    var user = req.user;
+    if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
+    var hash = md5.createHash(user.email.toLowerCase());
+    var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
+    avatar_url += '?s=40&r=pg&d=identicon' + defaultUrl;
+    var ouser = {
+      id: user.id, name: user.name, username:user.email,state:'active',email:user.email,avatar_url:avatar_url
+    }
+
+    res.json(ouser);
+    res.end();
+  });
+  
   // Get secret.
   app.get('/oauth/secret', app.oauth.authenticate(), function(req, res) {
     // Will require a valid access_token.
