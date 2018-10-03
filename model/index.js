@@ -68,7 +68,7 @@ module.exports.getClient = function(clientId, clientSecret) {
 		 	return {
 		 		clientId: oAuthClient.client_id,
 		 		clientSecret: oAuthClient.client_secret,
-		 		redirectUris: [oAuthClient.redirect_uri],
+		 		redirectUris: oAuthClient.redirect_uri?oAuthClient.redirect_uri.split('|'):[],
 		 		grants: ['password','authorization_code','refresh-token']
 		 	};
 		})
