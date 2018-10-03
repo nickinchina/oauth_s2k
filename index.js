@@ -21,13 +21,21 @@ module.exports = function(app, passport){
       req.path, req.query.client_id, req.query.redirect_uri,req.query.response_type);
   }
   var render_page = function(req, res, next, page){
-    sails._mixinResView(req,res,next);
-    return res.view(page+'/index.ejs', {
+    //sails._mixinResView(req,res,next);
+    var locals = {
       redirect: req.query.redirect,
       client_id: req.query.client_id,
       response_type: req.query.response_type,
       redirect_uri: req.query.redirect_uri
+    };
+    return res.render(page+'/index.ejs', locals, function (err, renderedViewStr){
+      if (err) {
+        console.log(err)
+        return res.json(400, err);
+      }
+      return res.send(renderedViewStr)
     });
+    //return res.view(page+'/index.ejs', );
   }
   
   
