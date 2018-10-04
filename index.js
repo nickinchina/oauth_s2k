@@ -79,7 +79,7 @@ module.exports = function(app, passport){
     
   });
   
-  app.get('/oauth/user',function(req, res) {
+  app.get('/api/v4/user',function(req, res) {
     var user = req.user;
     if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
     if (user) {
