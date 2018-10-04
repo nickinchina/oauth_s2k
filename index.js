@@ -15,7 +15,9 @@ module.exports = function(app, passport){
   app.oauth = new oauthServer({model: model});
   
   // Post token.
-  app.post('/oauth/token', app.oauth.token());
+  app.post('/oauth/token', function(req, res, next){
+    return app.oauth.token()(req, res, next)
+  });
   
   var login_redirect = function(req){
     return util.format('/oauth/login?redirect=%s&client_id=%s&redirect_uri=%s&response_type=%s', 
