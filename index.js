@@ -3,6 +3,7 @@
  */
 
 var oauthServer = require('./lib');
+var md5 = require('./lib/md5.js');
 var Response = oauthServer.Response;
 var util = require('util');
 var model = require('./model');
@@ -78,13 +79,12 @@ module.exports = function(app, passport){
     
   });
   
-  app.get('/oauth/user', app.oauth.authenticate(), function(req, res) {
-    // Will require a valid access_token.
+  app.get('/oauth/user',function(req, res) {
     var user = req.user;
     if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
     var hash = md5.createHash(user.email.toLowerCase());
     var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
-    avatar_url += '?s=40&r=pg&d=identicon' + defaultUrl;
+    avatar_url += '?s=40&r=pg&d=identicon';
     var ouser = {
       id: user.id, name: user.name, username:user.email,state:'active',email:user.email,avatar_url:avatar_url
     }
