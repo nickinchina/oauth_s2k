@@ -104,17 +104,20 @@ module.exports.getUser = function(username, password) {
 //Modified by Lucky, on Oct.1,2018
 module.exports.saveToken = module.exports.saveAccessToken = function(token, client, user) {
 	var params = [
-		{name:'access_token',type:'NVarChar',length:500,value:token.access_token},
-		{name:'access_token_expires_on',type:'DateTime',value:token.access_token_expires_on},
-		{name:'client_id',type:'NVarChar',length:80,value:client.id},
-		{name:'refresh_token',type:'NVarChar',length:500,value:token.refresh_token},
-		{name:'refresh_token_expires_on',type:'DateTime',value:token.refresh_token_expires_on},
-		{name:'user_id',type:'Int',length:100,value:user.id}
+		{name:'access_token',type:'NVarChar',length:500,value:token.accessToken},
+		{name:'access_token_expires_on',type:'DateTime',value:token.accessTokenExpiresAt},
+		{name:'client_id',type:'NVarChar',length:80,value:client.clientId},
+		{name:'refresh_token',type:'NVarChar',length:500,value:token.refreshToken},
+		{name:'refresh_token_expires_on',type:'DateTime',value:token.refreshTokenExpiresAt},
+		{name:'user_id',type:'Int',value:user.id}
 	];
 	return sql.query('hq.sp_oauth_save_token', params)
 		.then(function(result) {
 			console.log('saveAccessToken',result)
-			return result.length>0?result[0]:false;
+			var r = result.length>0?result[0]:false;
+			r.client = client;
+			r.user = user;
+			return r;
 		})
 		.catch(function (err) {
 	      console.log("saveAccessToken - Err: ", err)
@@ -131,10 +134,11 @@ module.exports.getAuthorizationCode = function(code) {
 			console.log('getAuthorizationCode',result)
       if (result.length==0) return false;
       var authCodeModel = result[0];
-      var client = authCodeModel.OAuthClient.toJSON()
-      var user = authCodeModel.User.toJSON()
+      var client = JSON.parse(authCodeModel.OAuthClient) ;
+      var user = JSON.parse(authCodeModel.User);
       return {
         code: code,
+        authorizationCode: code,
         client: client,
         expiresAt: authCodeModel.expires,
         redirectUri: client.redirect_uri,
@@ -163,4 +167,46 @@ module.exports.saveAuthorizationCode = function(code, client, user) {
     }).catch(function (err) {
       console.log("saveAuthorizationCode - Err: ", err)
     });
+}
+
+module.exports.revokeAuthorizationCode =function (code) {
+	var params = [
+    {name:'code',type:'NVarChar',length:256,value:code.code}
+  ];
+  return sql
+    .query("hq.sp_del_oauth_authorization_code", params)
+    .then(function () {
+    /***
+     * As per the discussion we need set older date
+     * revokeToken will expected return a boolean in future version
+     * https://github.com/oauthjs/node-oauth2-server/pull/274
+     * https://github.com/oauthjs/node-oauth2-server/issues/290
+     */
+    var expiredCode = code
+    expiredCode.expiresAt = new Date('2015-05-28T06:59:53.000Z')
+    return expiredCode
+  }).catch(function (err) {
+    console.log("revokeAuthorizationCode - Err: ", err)
+  });
+}
+
+module.exports.revokeToken = function (token) {
+	var params = [
+    {name:'code',type:'NVarChar',length:256,value:token.refreshToken}
+  ];
+  return sql
+    .query("hq.sp_oauth_del_token", params)
+    .then(function () {
+    /***
+     * As per the discussion we need set older date
+     * revokeToken will expected return a boolean in future version
+     * https://github.com/oauthjs/node-oauth2-server/pull/274
+     * https://github.com/oauthjs/node-oauth2-server/issues/290
+     */
+    var expiredToken = token
+    expiredToken.refreshTokenExpiresAt = new Date('2015-05-28T06:59:53.000Z')
+    return expiredToken
+  }).catch(function (err) {
+    console.log("revokeToken - Err: ", err)
+  });
 }

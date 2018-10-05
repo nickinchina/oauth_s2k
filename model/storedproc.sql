@@ -48,7 +48,7 @@ BEGIN
 		[refresh_token],
 		[refresh_token_expires_on],
 		[user_id])
-	OUTPUT inserted.id
+	OUTPUT inserted.[access_token] as accessToken
 	 VALUES
 		(NEWID(),
 		@access_token,
@@ -80,3 +80,18 @@ create or alter proc hq.sp_set_oauth_authorization_code
  as 
 	insert into hq.oauth_authorization_codes (id,client_id,authorization_code,user_id,expires,scope)
 	values (NEWID(),@client_id,@authorization_code,@user_id,@expires,@scope)
+GO 
+create or alter proc hq.sp_del_oauth_authorization_code
+	@code nvarchar(256)
+as
+	delete
+	from hq.oauth_authorization_codes 
+	where 1=0;
+	--where authorization_code=@code;
+GO
+
+CREATE OR ALTER PROCEDURE [hq].[sp_oauth_del_token]
+	@token nvarchar(500)
+AS
+	DELETE FROM hq.oauth_tokens 
+	WHERE (access_token=@token  OR refresh_token=@token);

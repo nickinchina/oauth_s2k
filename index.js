@@ -85,19 +85,15 @@ module.exports = function(app, passport){
   app.get('/api/v4/user',function(req, res) {
     var user = req.user;
     if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
-    if (user) {
-      var hash = md5.createHash(user.email.toLowerCase());
-      var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
-      avatar_url += '?s=40&r=pg&d=identicon';
-      var ouser = {
-        id: user.id, name: user.name, username:user.email,state:'active',email:user.email,avatar_url:avatar_url
-      }
-  
-      res.json(ouser);
-      res.end();
+    var hash = md5.createHash(user.email.toLowerCase());
+    var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
+    avatar_url += '?s=40&r=pg&d=identicon';
+    var ouser = {
+      id: user.id, name: user.name, username:user.email,state:'active',email:user.email,avatar_url:avatar_url
     }
-    else
-      res.json(400, {error: "empty request"});
+
+    res.json(ouser);
+    res.end();
   });
   
   // Get secret.
