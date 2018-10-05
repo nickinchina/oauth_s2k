@@ -83,6 +83,7 @@ module.exports = function(app, passport){
   });
   
   app.get('/api/v4/user',function(req, res) {
+    console.log('/api/v4/user', req.body);
     var user = req.user;
     if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
     var hash = md5.createHash(user.email.toLowerCase());
