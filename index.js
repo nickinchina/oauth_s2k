@@ -90,8 +90,7 @@ module.exports = function(app, passport){
         token = token.substr('Bearer '.length);
       return model.getAccessToken(token)
       .then(function(t){
-        console.log('/api/v4/user zzzzzz', t)
-        var user = t.user;
+        var user = JSON.parse(t.user) ;
         var hash = md5.createHash(user.email.toLowerCase());
         var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
         avatar_url += '?s=40&r=pg&d=identicon';

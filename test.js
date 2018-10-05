@@ -1,0 +1,1 @@
+var md5 = require('./lib/md5.js');
