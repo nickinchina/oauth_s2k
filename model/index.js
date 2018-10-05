@@ -17,14 +17,14 @@ module.exports.getAccessToken = function(bearerToken) {
 	];
 	return sql.query('hq.sp_oauth_get_token',params)
 	.then(function(result) {
-		if (result.length==0) return false;
-	 	var token = result[0];
+			if (result.length==0) return false;
+	 		var token = result[0];
 	  	return {
-			accessToken: token.access_token,
-			client: {id: token.client_id},
-			expires: token.expires,
-			user: token.user, // could be any object
-	  	};
+				accessToken: token.access_token,
+				client: {id: token.client_id},
+				expires: token.expires,
+				user: token.user, // could be any object
+		  	};
 	});
 };
 
@@ -61,7 +61,6 @@ module.exports.getClient = function(clientId, clientSecret) {
 	];
 	return sql.query('hq.sp_oauth_get_client',params)
 		.then(function(result) {
-		 	console.log('getClient',result,params)
 			if (result.length==0) return false;
 		 	var oAuthClient = result[0];
 		 	return {

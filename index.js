@@ -83,13 +83,14 @@ module.exports = function(app, passport){
   });
   
   app.get('/api/v4/user',function(req, res) {
-    console.log('/api/v4/user', req.headers.authorization)
+    console.log('/api/v4/userxxxxxxxxx', req.headers.authorization)
     var token = req.headers.authorization;
     if (token) {
       try {
         token = token.substr('Bearer '.length);
       return model.getAccessToken(token)
       .then(function(t){
+        console.log('/api/v4/user zzzzzz', t)
         var user = t.user;
         var hash = md5.createHash(user.email.toLowerCase());
         var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
