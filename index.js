@@ -96,7 +96,7 @@ module.exports = function(app, passport){
           id: user.id, name: user.name, username:user.email,state:'active',email:user.email,avatar_url:avatar_url
         }
     
-        res.json(ouser);
+        res.json([ouser]);
         res.end();
       })
     } 
