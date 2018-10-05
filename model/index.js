@@ -19,12 +19,11 @@ module.exports.getAccessToken = function(bearerToken) {
 	.then(function(result) {
 		if (result.length==0) return false;
 	 	var token = result[0];
-	 	console.log('getAccessToken',token)
 	  	return {
 			accessToken: token.access_token,
 			client: {id: token.client_id},
 			expires: token.expires,
-			user: {id: token.userId}, // could be any object
+			user: token.user, // could be any object
 	  	};
 	});
 };

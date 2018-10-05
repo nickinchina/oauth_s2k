@@ -4,8 +4,9 @@ CREATE OR ALTER PROCEDURE [hq].[sp_oauth_get_token]
 	@type tinyint=0
 AS
 BEGIN
-	SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id
-	  FROM hq.oauth_tokens 
+	SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, a.user_id,
+		(select id, accountid, name, email from hq.pz_user where id=a.user_id for json path, without_array_wrapper) as [user]
+	  FROM hq.oauth_tokens a
 	 WHERE (access_token=@token AND @type=0) 
 		OR (refresh_token=@token AND @type=1);
 END

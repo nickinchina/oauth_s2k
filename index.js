@@ -83,28 +83,38 @@ module.exports = function(app, passport){
   });
   
   app.get('/api/v4/user',function(req, res) {
-    var user = req.user;
-    if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
-    console.log('/api/v4/user', req.headers, req.body);
-    var hash = md5.createHash(user.email.toLowerCase());
-    var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
-    avatar_url += '?s=40&r=pg&d=identicon';
-    var ouser = {
-      id: user.id, name: user.name, username:user.email,state:'active',email:user.email,avatar_url:avatar_url
+    var token = req.headers.authorization;
+    if (token) {
+      token = token.substr('Bearer '.length);
+      model.getAccessToken(token)
+      .then(function(t){
+        var user = t.user;
+        var hash = md5.createHash(user.email.toLowerCase());
+        var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
+        avatar_url += '?s=40&r=pg&d=identicon';
+        var ouser = {
+          id: user.id, name: user.name, username:user.email,state:'active',email:user.email,avatar_url:avatar_url
+        }
+    
+        res.json(ouser);
+        res.end();
+      })
+    } 
+    else {
+      res.json(400, { error: "empty request" });
+      res.end();
     }
-
-    res.json(ouser);
-    res.end();
+    
   });
   
-  // Get secret.
-  app.get('/oauth/secret', app.oauth.authenticate(), function(req, res) {
-    // Will require a valid access_token.
-    res.send('Secret area');
-  });
+  // // Get secret.
+  // app.get('/oauth/secret', app.oauth.authenticate(), function(req, res) {
+  //   // Will require a valid access_token.
+  //   res.send('Secret area');
+  // });
   
-  app.get('/oauth/public', function(req, res) {
-    // Does not require an access_token.
-    res.send('Public area');
-  });
+  // app.get('/oauth/public', function(req, res) {
+  //   // Does not require an access_token.
+  //   res.send('Public area');
+  // });
 }
