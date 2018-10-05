@@ -15,7 +15,7 @@ module.exports.getAccessToken = function(bearerToken) {
 		{name:'token',type:'NVarChar',length:500,value:bearerToken},
 		{name:'type',type:'TinyInt',value:0}
 	];
-	sql.query('hq.sp_oauth_get_token',params)
+	return sql.query('hq.sp_oauth_get_token',params)
 	.then(function(result) {
 		if (result.length==0) return false;
 	 	var token = result[0];
