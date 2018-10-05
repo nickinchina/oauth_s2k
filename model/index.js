@@ -88,7 +88,6 @@ module.exports.getUser = function(username, password) {
 	];
 	return sql.query('hq.sp_oauth_get_user', params)
 		.then(function(result) {
-			console.log('getUser',result)
 			return result.length>0?result[0]:false;
 		})
 		.catch(function (err) {
@@ -112,7 +111,6 @@ module.exports.saveToken = module.exports.saveAccessToken = function(token, clie
 	];
 	return sql.query('hq.sp_oauth_save_token', params)
 		.then(function(result) {
-			console.log('saveAccessToken',result)
 			var r = result.length>0?result[0]:false;
 			r.client = client;
 			r.user = user;
@@ -130,7 +128,6 @@ module.exports.getAuthorizationCode = function(code) {
   return sql
     .query("hq.sp_get_oauth_authorization_code", params)
     .then(function (result) {
-			console.log('getAuthorizationCode',result)
       if (result.length==0) return false;
       var authCodeModel = result[0];
       var client = JSON.parse(authCodeModel.OAuthClient) ;
