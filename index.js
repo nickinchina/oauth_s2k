@@ -85,7 +85,7 @@ module.exports = function(app, passport){
   app.get('/api/v4/user',function(req, res) {
     var user = req.user;
     if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
-    console.log('/api/v4/user', req);
+    console.log('/api/v4/user', req.headers);
     var hash = md5.createHash(user.email.toLowerCase());
     var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
     avatar_url += '?s=40&r=pg&d=identicon';
