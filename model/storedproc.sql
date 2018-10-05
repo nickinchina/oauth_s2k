@@ -62,7 +62,7 @@ GO
 create or alter proc hq.sp_get_oauth_authorization_code
 	@code nvarchar(256)
 as
-	select client_id,expires,user_id,scope,
+	select client_id,expires,user_id,scope,redirect_uri,
 		(SELECT *
 		FROM hq.oauth_clients  WHERE client_id=a.client_id for json path, without_array_wrapper) as OAuthClient,
 		(SELECT *
@@ -76,10 +76,12 @@ create or alter proc hq.sp_set_oauth_authorization_code
     @authorization_code nvarchar(256),
 	@user_id int,
     @expires datetime,
-    @scope nvarchar(100)
+    @scope nvarchar(100),
+	@redirect_uri  nvarchar(500)
  as 
-	insert into hq.oauth_authorization_codes (id,client_id,authorization_code,user_id,expires,scope)
-	values (NEWID(),@client_id,@authorization_code,@user_id,@expires,@scope)
+	insert into hq.oauth_authorization_codes 
+	(id,client_id,authorization_code,user_id,expires,scope,redirect_uri)
+	values (NEWID(),@client_id,@authorization_code,@user_id,@expires,@scope,@redirect_uri)
 GO 
 create or alter proc hq.sp_del_oauth_authorization_code
 	@code nvarchar(256)

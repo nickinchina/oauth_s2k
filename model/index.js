@@ -62,9 +62,9 @@ module.exports.getClient = function(clientId, clientSecret) {
 	];
 	return sql.query('hq.sp_oauth_get_client',params)
 		.then(function(result) {
+		 	console.log('getClient',result,params)
 			if (result.length==0) return false;
 		 	var oAuthClient = result[0];
-		 	console.log('getClient',result)
 		 	return {
 		 		clientId: oAuthClient.client_id,
 		 		clientSecret: oAuthClient.client_secret,
@@ -141,7 +141,7 @@ module.exports.getAuthorizationCode = function(code) {
         authorizationCode: code,
         client: client,
         expiresAt: authCodeModel.expires,
-        redirectUri: client.redirect_uri,
+        redirectUri: authCodeModel.redirect_uri,
         user: user,
         scope: authCodeModel.scope,
       };
@@ -151,13 +151,13 @@ module.exports.getAuthorizationCode = function(code) {
 }
 
 module.exports.saveAuthorizationCode = function(code, client, user) {
-	
 	var params = [
 	    {name:'client_id',type:'NVarChar',length:80,value:client.clientId},
 	    {name:'authorization_code',type:'NVarChar',length:256,value:code.authorizationCode},
 	    {name:'user_id',type:'Int',value:user.id},
 	    {name:'expires',type:'DateTime',value:code.expiresAt},
-	    {name:'scope',type:'NVarChar',length:100,value:code.scope}
+	    {name:'scope',type:'NVarChar',length:100,value:code.scope},
+	    {name:'redirect_uri',type:'NVarChar',length:256,value:code.redirectUri}
 	];
   return sql
     .query("hq.sp_set_oauth_authorization_code", params)
