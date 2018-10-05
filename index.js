@@ -86,8 +86,9 @@ module.exports = function(app, passport){
     console.log('/api/v4/user', req.headers.authorization)
     var token = req.headers.authorization;
     if (token) {
-      token = token.substr('Bearer '.length);
-      model.getAccessToken(token)
+      try {
+        token = token.substr('Bearer '.length);
+      return model.getAccessToken(token)
       .then(function(t){
         var user = t.user;
         var hash = md5.createHash(user.email.toLowerCase());
@@ -103,9 +104,14 @@ module.exports = function(app, passport){
           "identities" : [{"provider" : "s2k","extern_uid" : 1}],
           "can_create_group" : true,"can_create_project" : true,"two_factor_enabled" : false,"external" : false,"shared_runners_minutes_limit": null
         }
+        console.log('/api/v4/user', ouser)
         res.json(ouser);
         res.end();
       })
+      } catch (ex){
+        console.log('xxxxxxx',ex)
+      }
+      
     } 
     else {
       res.json(400, { error: "empty request" });
