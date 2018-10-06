@@ -83,7 +83,7 @@ module.exports = function(app, passport){
   });
   
   app.get('/api/v4/user',function(req, res) {
-    console.log('/api/v4/userxxxxxxxxx', req.headers.authorization)
+    //console.log('/api/v4/userxxxxxxxxx', req.headers.authorization)
     var token = req.headers.authorization;
     if (token) {
         token = token.substr('Bearer '.length);
@@ -105,7 +105,6 @@ module.exports = function(app, passport){
             "identities" : [{"provider" : "s2k","extern_uid" : 1}],
             "can_create_group" : true,"can_create_project" : true,"two_factor_enabled" : false,"external" : false,"shared_runners_minutes_limit": null
           }
-          console.log('/api/v4/user', ouser)
           res.json(ouser);
           res.end();
           
