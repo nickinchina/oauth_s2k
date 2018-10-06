@@ -94,8 +94,9 @@ module.exports = function(app, passport){
         var hash = md5.createHash(user.email.toLowerCase());
         var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
         avatar_url += '?s=40&r=pg&d=identicon';
+        var username = (user.account+':'+user.name.replace(' ','_')).toLowerCase();
         var ouser = {
-          id: user.id, name: user.name, username:user.email,state:'active',
+          id: user.id, name: user.name, username:username,state:'active',
           avatar_url:avatar_url,web_url:'',
           "created_at" : "0000-00-00T00:00:00.000Z",
           "bio" : null,"location" : null,"skype" : "","linkedin" : "","twitter" : "","website_url" : "","organization" : null,
