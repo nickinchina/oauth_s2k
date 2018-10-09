@@ -1,3 +1,5 @@
+--Move to projectz_sqlserver
+/*
 --DROP PROCEDURE [hq].[sp_oauth_get_token]
 CREATE OR ALTER PROCEDURE [hq].[sp_oauth_get_token]
 	@token nvarchar(500),
@@ -99,3 +101,4 @@ CREATE OR ALTER PROCEDURE [hq].[sp_oauth_del_token]
 AS
 	DELETE FROM hq.oauth_tokens 
 	WHERE (access_token=@token  OR refresh_token=@token);
+*/	

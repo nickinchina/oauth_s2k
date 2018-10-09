@@ -1,3 +1,5 @@
+--Move to projectz_sqlserver
+/*
 --DROP TABLE [hq].[oauth_clients]
 CREATE TABLE [hq].[oauth_clients] (
 	client_id nvarchar(500) NOT NULL,
@@ -18,3 +20,4 @@ CREATE TABLE [hq].[oauth_tokens] (
 	CONSTRAINT [pk_oauth_tokens] PRIMARY KEY NONCLUSTERED (id)
 ) WITH ( MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_AND_DATA )
 GO
+*/
