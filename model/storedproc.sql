@@ -1,6 +1,7 @@
 --Move to projectz_sqlserver
 /*
 --DROP PROCEDURE [hq].[sp_oauth_get_token]
+[hq].[sp_oauth_get_token] '2c7f9b5419e45c5841ebab558d68843cce71bb61'
 CREATE OR ALTER PROCEDURE [hq].[sp_oauth_get_token]
 	@token nvarchar(500),
 	@type tinyint=0
