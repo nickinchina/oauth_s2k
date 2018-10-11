@@ -83,7 +83,7 @@ module.exports = function(app, passport){
   });
   
   app.get('/api/v4/user',function(req, res) {
-    //console.log('/api/v4/userxxxxxxxxx', req.headers.authorization)
+    console.log('/api/v4/userxxxxxxxxx', req.headers.authorization)
     var token = req.headers.authorization;
     if (token) {
         token = token.substr('Bearer '.length);
