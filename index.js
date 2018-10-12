@@ -124,19 +124,19 @@ module.exports = function(app, passport){
     
   });
   
-  // app.get('/apple-app-site-association', function(req, res){
-  //   return {
-  //       "applinks": {
-  //           "apps": [],
-  //           "details": [
-  //               {
-  //                   "appID": "org.reactjs.native.example.s2k5",
-  //                   "paths": [ "/s2k/*", "/oauth/authorize"]
-  //               }
-  //           ]
-  //       }
-  //   }
-  // })
+  app.get('/.well-known/apple-app-site-association', function(req, res){
+    return {
+        "applinks": {
+            "apps": [],
+            "details": [
+                {
+                    "appID": "org.reactjs.native.example.s2k5",
+                    "paths": [ "/s2k/*", "/oauth/authorize"]
+                }
+            ]
+        }
+    }
+  })
   // // Get secret.
   // app.get('/oauth/secret', app.oauth.authenticate(), function(req, res) {
   //   // Will require a valid access_token.
