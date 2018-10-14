@@ -93,8 +93,9 @@ module.exports = function(app, passport){
         try {
           var user = JSON.parse(t.user) ;
           var hash = md5.createHash(user.email.toLowerCase());
-          var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
-          avatar_url += '?s=40&r=pg&d=identicon';
+          // var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
+          // avatar_url += '?s=40&r=pg&d=identicon';
+          var avatar_url = null;
           var username = (user.account+':'+user.name.replace(' ','_')).toLowerCase();
           var ouser = {
             id: user.id, name: user.name, username:username,state:'active',
