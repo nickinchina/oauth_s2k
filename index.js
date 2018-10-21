@@ -83,8 +83,8 @@ module.exports = function(app, passport){
     
   });
   
-  app.get('/api/v4/user',function(req, res) {
-    console.log('/api/v4/userxxxxxxxxx', req.headers.authorization)
+  var user_func = function(req, res) {
+    console.log('user api', req.headers.authorization, req.url)
     var token = req.headers.authorization;
     if (token) {
         token = token.substr('Bearer '.length);
@@ -123,8 +123,9 @@ module.exports = function(app, passport){
       res.end();
     }
     
-  });
-  
+  }
+  app.get('/api/v4/user',user_func);
+  app.get('/api/v3/user',user_func);
   app.get('/.well-known/apple-app-site-association', function(req, res){
     return {
         "applinks": {
