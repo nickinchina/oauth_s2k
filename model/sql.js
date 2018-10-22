@@ -1,8 +1,8 @@
 var config = {
     user: 'sa',
     password: 'Ogram@9808',
-    server:  process.env.DB_SERVER||'10.0.0.99',
-    port: process.env.DB_PORT||31433,
+    server:  process.env.DBHOST||'10.0.0.99',
+    port: process.env.DBPORT||31433,
     database:process.env.DB_NAME||'s2k',
     connectionTimeout: 30000,
     requestTimeout: 120000,
