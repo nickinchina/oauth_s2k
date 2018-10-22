@@ -78,7 +78,7 @@ module.exports = function(app, passport){
     passport.authenticate('local', function(err, user, info) {
         var error = err || info;
         if (error) {
-          if (is_electron) return render_page(req, res, next, 'login', {state:err.message});
+          if (is_electron) return render_page(req, res, next, 'login', {state:error.message});
           return res.json(400, error);
         }
         req.logIn(user, function(err) {
