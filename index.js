@@ -24,7 +24,7 @@ module.exports = function(app, passport){
     return util.format('/oauth/login?redirect=%s&client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
       req.path, req.query.client_id, req.query.redirect_uri,req.query.response_type,req.query.state);
   }
-  var render_page = function(req, res, next, page){
+  var render_page = function(req, res, next, page, param_alt){
     //sails._mixinResView(req,res,next);
     var locals = {
       redirect: req.query.redirect,
@@ -33,6 +33,11 @@ module.exports = function(app, passport){
       redirect_uri: req.query.redirect_uri,
       state: req.query.state
     };
+    if (!!param_alt) {
+      Object.keys(param_alt).forEach(function(key){
+        locals[key] = param_alt[key]
+      })
+    }
     return res.render(page+'/index.ejs', locals, function (err, renderedViewStr){
       if (err) {
         console.log(err)
@@ -67,17 +72,25 @@ module.exports = function(app, passport){
   });
   
   // Post login.
-  app.post('/oauth/login', function(req, res) {
+  app.post('/oauth/login', function(req, res, next) {
+    var is_electron = req.body.client_id == "electron";
+    
     passport.authenticate('local', function(err, user, info) {
         var error = err || info;
         if (error) {
-            return res.json(400, error);
+          if (is_electron) return render_page(req, res, next, 'login', {state:err.message});
+          return res.json(400, error);
         }
         req.logIn(user, function(err) {
-            if (err) { return res.send(err); }
-            
-            return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
-              req.body.redirect, req.body.client_id, req.body.redirect_uri, req.body.response_type, req.body.state));
+          if (err) { 
+            if (is_electron) return render_page(req, res, next, 'login', {state:err.message});
+            return res.send(err); 
+          }
+          
+          if (is_electron) return render_page(req, res, next, 'postlogin', {state:user.id});
+          
+          return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
+            req.body.redirect, req.body.client_id, req.body.redirect_uri, req.body.response_type, req.body.state));
         });
     })(req, res);
     
