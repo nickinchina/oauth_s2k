@@ -99,7 +99,7 @@ module.exports = function(app, passport){
   
   var user_func = function(return_s2k_user) {
     return function(req, res) {
-      console.log('user api', req.headers.authorization, req.url)
+      console.log('user api', req.headers, req.url)
       var token = req.headers.authorization;
       if (token) {
           token = token.substr('Bearer '.length);
