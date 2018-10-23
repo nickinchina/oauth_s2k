@@ -55,7 +55,7 @@ module.exports = function(app, passport){
     var user = req.user;
     if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
     if (!user) return res.redirect(login_redirect(req));
-    console.log('req.headers.authorization',req.headers.authorization)
+    //console.log('req.headers.authorization',req.headers.authorization)
     var authenticateHandler = {
       handle: function(request, response) {
         return user;
@@ -101,8 +101,9 @@ module.exports = function(app, passport){
     return function(req, res) {
       console.log('user api', req.headers, req.url)
       var token = req.headers.authorization;
+      if (!!token) token = token.substr('Bearer '.length);
+      else token = req.query.access_token;
       if (token) {
-          token = token.substr('Bearer '.length);
         return model.getAccessToken(token)
         .then(function(t){
           try {
