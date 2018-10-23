@@ -73,25 +73,26 @@ module.exports = function(app, passport){
   
   // Post login.
   app.post('/oauth/login', function(req, res, next) {
-    var client_id = req.body.client_id;
-    var is_electron = req.body.client_id == "electron";
+    var body = req.body;
+    var client_id = body.client_id;
+    var is_electron = body.client_id == "electron";
     
     passport.authenticate('local', function(err, user, info) {
         var error = err || info;
         if (error) {
-          if (is_electron) return render_page(req, res, next, 'login', {state:error.message, client_id: client_id});
-          return res.json(400, error);
+          body.error = error.message;
+          return render_page(req, res, next, 'login', body);
         }
         req.logIn(user, function(err) {
           if (err) { 
-            if (is_electron) return render_page(req, res, next, 'login', {state:err.message, client_id: client_id});
-            return res.send(err); 
+            body.error = err.message;
+            return render_page(req, res, next, 'login', body);
           }
           
           if (is_electron) return render_page(req, res, next, 'postlogin', {state:user.id});
           
           return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
-            req.body.redirect, req.body.client_id, req.body.redirect_uri, req.body.response_type, req.body.state));
+            body.redirect, body.client_id, body.redirect_uri, body.response_type, body.state));
         });
     })(req, res);
     
