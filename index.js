@@ -38,6 +38,7 @@ module.exports = function(app, passport){
         locals[key] = param_alt[key]
       })
     }
+    if (!locals.hasOwnProperty('error')) locals.error = null;
     return res.render(page+'/index.ejs', locals, function (err, renderedViewStr){
       if (err) {
         console.log(err)
