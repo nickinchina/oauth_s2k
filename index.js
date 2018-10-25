@@ -129,7 +129,7 @@ module.exports = function(app, passport){
               res.json(ouser);
             }
             else
-              res.json(user);
+              res.json({id:user.id});
             res.end();
             
           } catch (ex){
