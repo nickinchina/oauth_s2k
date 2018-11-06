@@ -16,16 +16,16 @@ module.exports = function(app, passport){
   
   // Post token.
   app.post('/oauth/token', function(req, res, next){
-    //console.log('/oauth/token', req.body, req.url)
+    console.log('/oauth/token', req.body, req.queryl)
     if (req.query.client_id=='839266495191'){
       req = {
         query:{},
-        body: querystring.stringify(req.query),
+        body: req.query,
         headers: req.headers,
         method: req.method
       }
       req.headers['Content-Type']= 'application/x-www-form-urlencoded';
-      req.headers['Content-Length'] = req.body.length;
+      //req.headers['Content-Length'] = req.body.length;
     }
     return app.oauth.token()(req, res, next)
   });
