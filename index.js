@@ -7,7 +7,7 @@ var md5 = require('./lib/md5.js');
 var Response = oauthServer.Response;
 var util = require('util');
 var model = require('./model');
-
+var querystring = require('querystring');
 // Create an Express application.
 
 module.exports = function(app, passport){
@@ -16,7 +16,17 @@ module.exports = function(app, passport){
   
   // Post token.
   app.post('/oauth/token', function(req, res, next){
-    console.log('/oauth/token', req.body, req.url)
+    //console.log('/oauth/token', req.body, req.url)
+    if (req.query.client_id=='839266495191'){
+      req = {
+        query:{},
+        body: querystring.stringify(req.query),
+        headers: req.headers,
+        method: req.method
+      }
+      req.headers['Content-Type']= 'application/x-www-form-urlencoded';
+      req.headers['Content-Length'] = req.body.length;
+    }
     return app.oauth.token()(req, res, next)
   });
   

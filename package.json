@@ -25,7 +25,8 @@
     "bluebird": "^3.0.5",
     "oauth2-server": "3.0.1",
     "q": "1.5.1",
-    "mssql": "3.3.0"
+    "mssql": "3.3.0",
+    "querystring":"0.2.0"
   },
   "devDependencies": {
     "body-parser": "^1.14.1",
