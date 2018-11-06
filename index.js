@@ -160,7 +160,6 @@ module.exports = function(app, passport){
   
   app.get('/api/v4/user',user_func());
   app.get('/api/v3/user',user_func());
-  app.get('/api/v1/auth',user_func());
   app.get('/api/v1/user',user_func(true));
   app.get('/.well-known/apple-app-site-association', function(req, res){
     return {
