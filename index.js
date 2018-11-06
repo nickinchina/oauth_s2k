@@ -72,6 +72,16 @@ module.exports = function(app, passport){
     return render_page(req, res, next, 'login');
   });
   
+  // Get forget pass.
+  app.get('/oauth/forgot', function(req, res, next) {
+    return render_page(req, res, next, 'forgot');
+  });
+  
+  // Get forget pass.
+  app.post('/oauth/forgot', function(req, res, next) {
+    return render_page(req, res, next, 'forgot');
+  });
+  
   // Post login.
   app.post('/oauth/login', function(req, res, next) {
     var body = req.body;
@@ -150,6 +160,7 @@ module.exports = function(app, passport){
   
   app.get('/api/v4/user',user_func());
   app.get('/api/v3/user',user_func());
+  app.get('/api/v1/auth',user_func());
   app.get('/api/v1/user',user_func(true));
   app.get('/.well-known/apple-app-site-association', function(req, res){
     return {
