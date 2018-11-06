@@ -16,7 +16,7 @@ module.exports = function(app, passport){
   
   // Post token.
   app.post('/oauth/token', function(req, res, next){
-    console.log('/oauth/token', req.body)
+    console.log('/oauth/token', req.body, req.url)
     return app.oauth.token()(req, res, next)
   });
   
