@@ -7,7 +7,7 @@ var md5 = require('./lib/md5.js');
 var Response = oauthServer.Response;
 var util = require('util');
 var model = require('./model');
-var querystring = require('querystring');
+var basicAuth = require('./lib/basicAuth');
 // Create an Express application.
 
 module.exports = function(app, passport){
@@ -64,16 +64,36 @@ module.exports = function(app, passport){
   app.all('/oauth/authorize', function(req, res, next) {
     // Redirect anonymous users to login page.
     var user = req.user;
-    if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
-    if (!user) return res.redirect(login_redirect(req));
-    //console.log('req.headers.authorization',req.headers.authorization)
-    var authenticateHandler = {
-      handle: function(request, response) {
-        return user;
+    var authenticateHandler = function(u){
+      return {
+        handle: function(request, response) {
+          return u;
+        }
       }
+    };
+    
+    if (req.session.passport && req.session.passport.user && req.session.passport.user) user = req.session.passport.user;
+    if (!user){
+      var buser = basicAuth(req);
+      if (!!buser && !buser.name && !buser.pass) {
+        return passport.authenticate('basic', function(err, user, info) {
+            var error = err || info;
+            if (error) return res.send(400, error);
+            req.logIn(user, function(err) {
+              if (err) return res.send(400, err);
+              return app.oauth.authorize({
+                authenticateHandler:authenticateHandler(user),allowEmptyState:true
+              })(req, res, next);
+            });
+        })(req, res);
+      }
+      else 
+        return res.redirect(login_redirect(req));
     }
+    //console.log('req.headers.authorization',req.headers.authorization)
+    
     return app.oauth.authorize({
-      authenticateHandler:authenticateHandler,allowEmptyState:true
+      authenticateHandler:authenticateHandler(user),allowEmptyState:true
     })(req, res, next);
   });
   
