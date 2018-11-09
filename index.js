@@ -77,6 +77,11 @@ module.exports = function(app, passport){
     })(req, res, next);
   });
   
+  app.get('/oauth/logout', function (req, res) {
+      req.logout();
+      return res.json(200, 'ok');
+  });
+  
   // Get login.
   app.get('/oauth/login', function(req, res, next) {
     return render_page(req, res, next, 'login');
