@@ -138,6 +138,7 @@ module.exports = function(app, passport){
           }
           
           if (is_electron) return render_page(req, res, next, 'postlogin', {state:user.id});
+          console.log('body', body)
           if (body.state=="freshdesk"){
             var fd_url= GetFreshUrl(body.redirect_uri, 'ff238ac4305ba4d97a07fe62280458f8', user.name, user.email)
             console.log('fd_url', fd_url)
