@@ -139,12 +139,13 @@ module.exports = function(app, passport){
           
           if (is_electron) return render_page(req, res, next, 'postlogin', {state:user.id});
           if (body.state=="freshdesk"){
-            body.redirect_uri= GetFreshUrl(body.redirect_uri, 'ff238ac4305ba4d97a07fe62280458f8', user.name, user.email)
+            var fd_url= GetFreshUrl(body.redirect_uri, 'ff238ac4305ba4d97a07fe62280458f8', user.name, user.email)
+            console.log('fd_url', fd_url)
+            return res.redirect(fd_url)
           }
-          var fd_url = util.format('%s?client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
-            body.redirect, body.client_id, body.redirect_uri, body.response_type, body.state);
-          console.log('fd_url', fd_url)
-          return res.redirect(fd_url);
+          else
+            return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
+              body.redirect, body.client_id, body.redirect_uri, body.response_type, body.state));
         });
     })(req, res);
     
