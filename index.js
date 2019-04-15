@@ -8,6 +8,8 @@ var Response = oauthServer.Response;
 var util = require('util');
 var model = require('./model');
 var basicAuth = require('./lib/basicAuth');
+var crypto = require('crypto');
+  
 // Create an Express application.
 
 module.exports = function(app, passport){
@@ -136,7 +138,9 @@ module.exports = function(app, passport){
           }
           
           if (is_electron) return render_page(req, res, next, 'postlogin', {state:user.id});
-          
+          if (body.state=="freshdesk"){
+            body.redirect_uri= GetFreshUrl(body.redirect_uri, '8279f5e1e3f6a3bbf4709814a9d56ee6', user.name, user.email)
+          }
           return res.redirect(util.format('%s?client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
             body.redirect, body.client_id, body.redirect_uri, body.response_type, body.state));
         });
@@ -144,6 +148,24 @@ module.exports = function(app, passport){
     
   });
   
+  function GetFreshUrl( baseUrl,  secret,  name,  email) {
+    var d = new Date();
+    var userTimezoneOffset = d.getTimezoneOffset() * 60000;
+    d = new Date(d.getTime() - userTimezoneOffset);
+    var timems = d.getTime();
+    
+    return util.format("%s/login/sso?name=%s&email=%s&timestamp=%s&hash=%s", 
+            baseUrl, encodeURIComponent(name), encodeURIComponent(email), timems, GetHash(secret, name, email, timems))
+  }
+
+  function GetHash( secret,  name,  email,  timems) {
+      var hmac = crypto.createHmac("md5", secret);
+      var input = name + secret + email + timems;
+      hmac.update(input);   
+      var crypted = hmac.digest("hex");
+      return crypted;
+  }
+
   var user_func = function(return_s2k_user) {
     return function(req, res) {
       console.log('user api', req.headers, req.url)
