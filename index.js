@@ -156,7 +156,7 @@ module.exports = function(app, passport){
     var d = new Date();
     var userTimezoneOffset = d.getTimezoneOffset() * 60000;
     d = new Date(d.getTime() - userTimezoneOffset);
-    var timems = d.getTime();
+    var timems = d/1000;
     
     return util.format("%s/login/sso?name=%s&email=%s&timestamp=%s&hash=%s", 
             baseUrl, encodeURIComponent(name), encodeURIComponent(email), timems, GetHash(secret, name, email, timems))
