@@ -96,7 +96,7 @@ module.exports = function(app, passport){
       }
       else 
         //return res.redirect(login_redirect(req));
-        return render_page_simple(res, {redirect_uri:login_redirect(req)});
+        return render_page_simple(res, 'redirect', {redirect_uri:login_redirect(req)});
     }
     //console.log('req.headers.authorization',req.headers.authorization)
     
