@@ -8,7 +8,7 @@ var Response = oauthServer.Response;
 var util = require('util');
 var model = require('./model');
 var basicAuth = require('./lib/basicAuth');
-var crypto = require('crypto');
+var freshdesk = require('./lib/freshdesk')
   
 // Create an Express application.
 
@@ -98,7 +98,11 @@ module.exports = function(app, passport){
         //return res.redirect(login_redirect(req));
         return render_page_simple(res, 'redirect', {redirect_uri:login_redirect(req)});
     }
-    console.log('req.headers.authorization',user)
+    
+    if (req.body.state=="freshdesk"){
+      var fd_url= freshdesk.GetFreshUrl(req.body.redirect_uri, user)
+      return res.redirect(fd_url)
+    }
     
     return app.oauth.authorize({
       authenticateHandler:authenticateHandler(user),allowEmptyState:true
@@ -144,9 +148,9 @@ module.exports = function(app, passport){
           }
           
           if (is_electron) return render_page(req, res, next, 'postlogin', {state:user.id});
-          console.log('body', body)
+          
           if (body.state=="freshdesk"){
-            var fd_url= GetFreshUrl(body.redirect_uri, 'ff238ac4305ba4d97a07fe62280458f8', user.name, user.email)
+            var fd_url= freshdesk.GetFreshUrl(body.redirect_uri, user)
             return res.redirect(fd_url)
           }
           else
@@ -157,23 +161,7 @@ module.exports = function(app, passport){
     
   });
   
-  function GetFreshUrl( baseUrl,  secret,  name,  email) {
-    var d = new Date();
-    var userTimezoneOffset = d.getTimezoneOffset() * 60000;
-    d = new Date(d.getTime() - userTimezoneOffset);
-    var timems = d/1000;
-    
-    return util.format("%s/login/sso?name=%s&email=%s&timestamp=%s&hash=%s", 
-            baseUrl, encodeURIComponent(name), encodeURIComponent(email), timems, GetHash(secret, name, email, timems))
-  }
-
-  function GetHash( secret,  name,  email,  timems) {
-      var hmac = crypto.createHmac("md5", secret);
-      var input = name + secret + email + timems;
-      hmac.update(input);   
-      var crypted = hmac.digest("hex");
-      return crypted;
-  }
+  
 
   var user_func = function(return_s2k_user) {
     return function(req, res) {
