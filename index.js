@@ -111,10 +111,13 @@ module.exports = function(app, passport){
   
   app.get('/oauth/logout', function (req, res) {
       req.logout();
-      console.log('req.query.host_url', req.query.host_url)
-      return res.json(200, 'ok');
-      if (!!req.query.host_url)
-        return res.redirect(req.query.host_url)
+      
+      var host_url = req.query.host_url;
+      if (!!host_url) {
+        if (host_url.substr(0,4)!="https")
+          host_url = "https://" + host_url;
+        return res.redirect(host_url)
+      }
       else
         return res.json(200, 'ok');
   });
