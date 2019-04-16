@@ -99,8 +99,8 @@ module.exports = function(app, passport){
         return render_page_simple(res, 'redirect', {redirect_uri:login_redirect(req)});
     }
     
-    if (req.body.state=="freshdesk"){
-      var fd_url= freshdesk.GetFreshUrl(req.body.redirect_uri, user)
+    if (req.query.state=="freshdesk"){
+      var fd_url= freshdesk.GetFreshUrl(req.query.redirect_uri, user)
       return res.redirect(fd_url)
     }
     
@@ -111,7 +111,10 @@ module.exports = function(app, passport){
   
   app.get('/oauth/logout', function (req, res) {
       req.logout();
-      return res.json(200, 'ok');
+      if (!!req.query.host_url)
+        return res.redirect(req.query.host_url)
+      else
+        return res.json(200, 'ok');
   });
   
   // Get login.
