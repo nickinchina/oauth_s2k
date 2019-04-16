@@ -36,6 +36,17 @@ module.exports = function(app, passport){
     return util.format('/oauth/login?redirect=%s&client_id=%s&redirect_uri=%s&response_type=%s&state=%s', 
       req.path, req.query.client_id, req.query.redirect_uri,req.query.response_type,req.query.state);
   }
+  
+  var render_page_simple = function(res, page, locals){
+    return res.render(page+'/index.ejs', locals, function (err, renderedViewStr){
+      if (err) {
+        console.log(err)
+        return res.json(400, err);
+      }
+      return res.send(renderedViewStr)
+    });
+  }
+  
   var render_page = function(req, res, next, page, param_alt){
     //sails._mixinResView(req,res,next);
     var locals = {
@@ -51,13 +62,7 @@ module.exports = function(app, passport){
       })
     }
     if (!locals.hasOwnProperty('error')) locals.error = null;
-    return res.render(page+'/index.ejs', locals, function (err, renderedViewStr){
-      if (err) {
-        console.log(err)
-        return res.json(400, err);
-      }
-      return res.send(renderedViewStr)
-    });
+    return render_page_simple(res, page, locals);
     //return res.view(page+'/index.ejs', );
   }
   
@@ -90,7 +95,8 @@ module.exports = function(app, passport){
         })(req, res);
       }
       else 
-        return res.redirect(login_redirect(req));
+        //return res.redirect(login_redirect(req));
+        return render_page_simple(res, {redirect_uri:login_redirect(req)});
     }
     //console.log('req.headers.authorization',req.headers.authorization)
     
@@ -141,7 +147,6 @@ module.exports = function(app, passport){
           console.log('body', body)
           if (body.state=="freshdesk"){
             var fd_url= GetFreshUrl(body.redirect_uri, 'ff238ac4305ba4d97a07fe62280458f8', user.name, user.email)
-            console.log('fd_url', fd_url)
             return res.redirect(fd_url)
           }
           else
