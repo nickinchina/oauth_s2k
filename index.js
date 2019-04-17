@@ -114,7 +114,7 @@ module.exports = function(app, passport){
       
       var host_url = req.query.host_url;
       if (!!host_url) {
-        if (host_url.substr(0,4)!="https")
+        if (host_url.substr(0,5)!="https")
           host_url = "https://" + host_url;
         return res.redirect(host_url)
       }
