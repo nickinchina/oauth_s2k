@@ -9,7 +9,8 @@ var util = require('util');
 var model = require('./model');
 var basicAuth = require('./lib/basicAuth');
 var freshdesk = require('./lib/freshdesk')
-  
+var jwt = require('jsonwebtoken');
+
 // Create an Express application.
 
 module.exports = function(app, passport){
@@ -171,7 +172,7 @@ module.exports = function(app, passport){
   
   
 
-  var user_func = function(return_s2k_user) {
+  var user_func = function(return_type) {
     return function(req, res) {
       console.log('user api', req.headers, req.url)
       var token = req.headers.authorization;
@@ -182,26 +183,39 @@ module.exports = function(app, passport){
         .then(function(t){
           try {
             var user = JSON.parse(t.user) ;
-            if (!return_s2k_user) {
-              //var hash = md5.createHash(user.email.toLowerCase());
-              // var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
-              // avatar_url += '?s=40&r=pg&d=identicon';
-              var avatar_url = null;
-              var username = (user.account+':'+user.name.replace(' ','_')).toLowerCase();
-              var ouser = {
-                id: user.id, name: user.name, username:username,state:'active',
-                avatar_url:avatar_url,web_url:'',
-                "created_at" : "0000-00-00T00:00:00.000Z",
-                "bio" : null,"location" : null,"skype" : "","linkedin" : "","twitter" : "","website_url" : "","organization" : null,
-                "last_sign_in_at" : "0000-00-00T00:00:00.000Z","confirmed_at" : "0000-00-00T00:00:00.000Z","last_activity_on" : null,
-                email:user.email,"theme_id" : 1,"color_scheme_id" : 1,"projects_limit" : 100000,"current_sign_in_at" : "0000-00-00T00:00:00.000Z",
-                "identities" : [{"provider" : "s2k","extern_uid" : 1}],
-                "can_create_group" : true,"can_create_project" : true,"two_factor_enabled" : false,"external" : false,"shared_runners_minutes_limit": null
-              }
-              res.json(ouser);
+            return_type = return_type || 0;
+            switch (return_type) {
+              case 1:
+                res.json({id:user.id});
+                break;
+              case 2:
+                var ouser = {id: user.id, email:user.email}
+                var jwt_secret = process.env.JWT_SECRET;
+                if (!!jwt_secret) 
+                  ouser.data = jwt.sign({data: user.email}, jwt_secret, { expiresIn: '1h' });
+
+                res.json(ouser);
+                break;
+              default:
+                //var hash = md5.createHash(user.email.toLowerCase());
+                // var avatar_url = 'https://secure.gravatar.com/avatar/' + hash;
+                // avatar_url += '?s=40&r=pg&d=identicon';
+                var avatar_url = null;
+                var username = (user.account+':'+user.name.replace(' ','_')).toLowerCase();
+                var ouser = {
+                  id: user.id, name: user.name, username:username,state:'active',
+                  avatar_url:avatar_url,web_url:'',
+                  "created_at" : "0000-00-00T00:00:00.000Z",
+                  "bio" : null,"location" : null,"skype" : "","linkedin" : "","twitter" : "","website_url" : "","organization" : null,
+                  "last_sign_in_at" : "0000-00-00T00:00:00.000Z","confirmed_at" : "0000-00-00T00:00:00.000Z","last_activity_on" : null,
+                  email:user.email,"theme_id" : 1,"color_scheme_id" : 1,"projects_limit" : 100000,"current_sign_in_at" : "0000-00-00T00:00:00.000Z",
+                  "identities" : [{"provider" : "s2k","extern_uid" : 1}],
+                  "can_create_group" : true,"can_create_project" : true,"two_factor_enabled" : false,"external" : false,"shared_runners_minutes_limit": null
+                }
+                res.json(ouser);
+                break;
             }
-            else
-              res.json({id:user.id});
+              
             res.end();
             
           } catch (ex){
@@ -222,7 +236,8 @@ module.exports = function(app, passport){
   
   app.get('/api/v4/user',user_func());
   app.get('/api/v3/user',user_func());
-  app.get('/api/v1/user',user_func(true));
+  app.get('/api/v2/user',user_func(2));
+  app.get('/api/v1/user',user_func(1));
   app.get('/.well-known/apple-app-site-association', function(req, res){
     return {
         "applinks": {
