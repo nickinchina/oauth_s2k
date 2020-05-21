@@ -192,7 +192,7 @@ module.exports = function(app, passport){
                 var ouser = {id: user.id, email:user.email}
                 var jwt_secret = process.env.JWT_SECRET;
                 if (!!jwt_secret) 
-                  ouser.data = jwt.sign({Name: user.email}, jwt_secret, { expiresIn: '1h' });
+                  ouser.data = jwt.sign({"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": user.email}, jwt_secret, { expiresIn: '1h' });
 
                 res.json(ouser);
                 break;
