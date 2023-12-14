@@ -122,7 +122,15 @@ module.exports = function(app, passport){
       else
         return res.json(200, 'ok');
   });
-
+  
+  const getUserSession = function(client, key) {
+    return new Promise((resolve, reject)=>{
+        client.get(key, (err, value) => {
+            if (err) reject(err);
+            resolve(JSON.parse(value));
+          });
+    })
+}
   const getUserSessionKeys = function(client) {
     return new Promise((resolve, reject)=>{
         client.keys('*', (err, keys) => {
