@@ -142,7 +142,7 @@ module.exports = function(app, passport){
       })
   }
 
-  app.get('/oauth/forceout', async function (req, res) {
+  app.post('/oauth/forceout', async function (req, res) {
     const client = sails.config.session.store.client;
     const keys = await getUserSessionKeys(client);
     var cnt = 0;
