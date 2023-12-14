@@ -122,6 +122,44 @@ module.exports = function(app, passport){
       else
         return res.json(200, 'ok');
   });
+
+  const getUserSessionKeys = function(client) {
+    return new Promise((resolve, reject)=>{
+        client.keys('*', (err, keys) => {
+            if (err) reject(err);
+            resolve(keys);
+        });
+    })
+  }
+
+  const destroyUserSession= function(client, key) {
+      return new Promise((resolve, reject)=>{
+          client.del(key, function(err, r){
+              if (err) reject(err);
+              console.log('destroyUserSession', key, r)
+              resolve();
+          })
+      })
+  }
+
+  app.get('/oauth/forceout', async function (req, res) {
+    const client = sails.config.session.store.client;
+    const keys = await getUserSessionKeys(client);
+    var cnt = 0;
+    const {email, token}  = req.body;
+    if (token == "2447532") {
+      for (var i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const user = await getUserSession(client, key);
+        if (!!user && !!user.passport && !!user.passport.user && user.passport.user.email == email) {
+            await destroyUserSession(client, key);
+            cnt ++;
+        }
+      }
+      return res.json(200, {cnt});
+    }
+    else return res.send(403);
+});
   
   // Get login.
   app.get('/oauth/login', function(req, res, next) {
